@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { Search, Bell, Command, Plus } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { Search, Bell, Command, Plus, LogOut, User, Settings } from "lucide-react";
 
 interface TopbarProps {
   title: string;
@@ -11,6 +12,24 @@ interface TopbarProps {
 
 export function Topbar({ title, subtitle, actions }: TopbarProps) {
   const [q, setQ] = useState("");
+  const [accountOpen, setAccountOpen] = useState(false);
+  const accountRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!accountOpen) return;
+    const onClick = (e: MouseEvent) => {
+      if (!accountRef.current?.contains(e.target as Node)) setAccountOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setAccountOpen(false);
+    };
+    document.addEventListener("mousedown", onClick);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onClick);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [accountOpen]);
 
   return (
     <header className="sticky top-0 z-30 h-14 border-b border-[#ECEEF2] bg-white/85 backdrop-blur-xl">
@@ -57,13 +76,69 @@ export function Topbar({ title, subtitle, actions }: TopbarProps) {
           <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-[#DC2626] ring-2 ring-white" />
         </button>
 
-        {/* Avatar */}
-        <button
-          aria-label="Account"
-          className="grid h-8 w-8 place-items-center rounded-full bg-[#0F172A] text-[11px] font-semibold text-white transition-transform duration-150 hover:scale-105"
-        >
-          AL
-        </button>
+        {/* Avatar + account menu */}
+        <div ref={accountRef} className="relative">
+          <button
+            type="button"
+            aria-label="Account"
+            aria-haspopup="menu"
+            aria-expanded={accountOpen}
+            onClick={() => setAccountOpen((v) => !v)}
+            className="grid h-8 w-8 place-items-center rounded-full bg-[#0F172A] text-[11px] font-semibold text-white transition-transform duration-150 hover:scale-105"
+          >
+            AL
+          </button>
+
+          {accountOpen && (
+            <div
+              role="menu"
+              className="absolute right-0 top-[calc(100%+8px)] z-40 w-56 overflow-hidden rounded-xl border border-[#ECEEF2] bg-white shadow-[0_12px_32px_-12px_rgba(15,23,42,0.18)]"
+            >
+              <div className="flex items-center gap-3 border-b border-[#ECEEF2] px-3 py-3">
+                <span className="grid h-9 w-9 place-items-center rounded-full bg-[#0F172A] text-[11px] font-semibold text-white">
+                  AL
+                </span>
+                <div className="min-w-0">
+                  <p className="truncate text-[13px] font-semibold text-[#0F172A]">Alex Lin</p>
+                  <p className="truncate text-[11px] text-[#6B7280]">alex@planetmetrics.app</p>
+                </div>
+              </div>
+
+              <div className="py-1">
+                <Link
+                  href="/dashboard/settings"
+                  role="menuitem"
+                  onClick={() => setAccountOpen(false)}
+                  className="flex items-center gap-2.5 px-3 py-2 text-[13px] text-[#0F172A] transition-colors duration-150 hover:bg-[#F6F7F9]"
+                >
+                  <User size={14} strokeWidth={1.75} className="text-[#6B7280]" />
+                  Profile
+                </Link>
+                <Link
+                  href="/dashboard/settings"
+                  role="menuitem"
+                  onClick={() => setAccountOpen(false)}
+                  className="flex items-center gap-2.5 px-3 py-2 text-[13px] text-[#0F172A] transition-colors duration-150 hover:bg-[#F6F7F9]"
+                >
+                  <Settings size={14} strokeWidth={1.75} className="text-[#6B7280]" />
+                  Settings
+                </Link>
+              </div>
+
+              <div className="border-t border-[#ECEEF2] py-1">
+                <Link
+                  href="/login"
+                  role="menuitem"
+                  onClick={() => setAccountOpen(false)}
+                  className="flex items-center gap-2.5 px-3 py-2 text-[13px] text-[#DC2626] transition-colors duration-150 hover:bg-[#FEF2F2]"
+                >
+                  <LogOut size={14} strokeWidth={1.75} />
+                  Log out
+                </Link>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );
