@@ -14,7 +14,7 @@ export function Topbar({ title, subtitle, actions }: TopbarProps) {
 
   return (
     <header className="sticky top-0 z-30 h-14 border-b border-[#ECEEF2] bg-white/85 backdrop-blur-xl">
-      <div className="flex h-14 items-center gap-4 px-6">
+      <div className="flex h-14 items-center gap-4 px-6 pl-16 lg:pl-6">
         {/* Title block */}
         <div className="min-w-0 flex-1">
           <h1 className="truncate text-[16px] font-semibold tracking-tight text-[#0F172A]">
